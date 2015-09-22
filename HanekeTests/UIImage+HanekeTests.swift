@@ -78,12 +78,12 @@ class UIImage_HanekeTests: XCTestCase {
     
     func testDecompressedImage_RGBA() {
         let color = UIColor(red:255, green:0, blue:0, alpha:0.5)
-        self._testDecompressedImageUsingColor(color: color, alphaInfo: .PremultipliedLast)
+        self._testDecompressedImageUsingColor(color, alphaInfo: .PremultipliedLast)
     }
     
     func testDecompressedImage_ARGB() {
         let color = UIColor(red:255, green:0, blue:0, alpha:0.5)
-        self._testDecompressedImageUsingColor(color: color, alphaInfo: .PremultipliedFirst)
+        self._testDecompressedImageUsingColor(color, alphaInfo: .PremultipliedFirst)
     }
     
     func testDecompressedImage_RGBX() {
@@ -97,7 +97,7 @@ class UIImage_HanekeTests: XCTestCase {
     func testDecompressedImage_Gray_AlphaNone() {
         let color = UIColor.grayColor()
         let colorSpaceRef = CGColorSpaceCreateDeviceGray()
-        self._testDecompressedImageUsingColor(color: color, colorSpace: colorSpaceRef, alphaInfo: .None)
+        self._testDecompressedImageUsingColor(color, colorSpace: colorSpaceRef!, alphaInfo: .None)
     }
     
     func testDecompressedImage_OrientationUp() {
@@ -135,39 +135,39 @@ class UIImage_HanekeTests: XCTestCase {
     func testDataCompressionQuality() {
         let image = UIImage.imageWithColor(UIColor.redColor(), CGSizeMake(10, 10))
         let data = image.hnk_data()
-        let notExpectedData = image.hnk_data(compressionQuality: 0.5)
+        let notExpectedData = image.hnk_data(0.5)
         
         XCTAssertNotEqual(data, notExpectedData)
     }
     
     func testDataCompressionQuality_LessThan0() {
         let image = UIImage.imageWithColor(UIColor.redColor(), CGSizeMake(10, 10))
-        let data = image.hnk_data(compressionQuality: -1.0)
-        let expectedData = image.hnk_data(compressionQuality: 0.0)
+        let data = image.hnk_data(-1.0)
+        let expectedData = image.hnk_data(0.0)
         
         XCTAssertEqual(data, expectedData, "The min compression quality is 0.0")
     }
     
     func testDataCompressionQuality_MoreThan1() {
         let image = UIImage.imageWithColor(UIColor.redColor(), CGSizeMake(10, 10))
-        let data = image.hnk_data(compressionQuality: 10.0)
-        let expectedData = image.hnk_data(compressionQuality: 1.0)
+        let data = image.hnk_data(10.0)
+        let expectedData = image.hnk_data(1.0)
         
         XCTAssertEqual(data, expectedData, "The min compression quality is 1.0")
     }
     
     // MARK: Helpers
     
-    func _testDecompressedImageUsingColor(color : UIColor = UIColor.greenColor(), colorSpace: CGColorSpaceRef = CGColorSpaceCreateDeviceRGB(), alphaInfo :CGImageAlphaInfo, bitsPerComponent : size_t = 8) {
+    func _testDecompressedImageUsingColor(color : UIColor = UIColor.greenColor(), colorSpace: CGColorSpaceRef = CGColorSpaceCreateDeviceRGB()!, alphaInfo :CGImageAlphaInfo, bitsPerComponent : size_t = 8) {
         let size = CGSizeMake(10, 20) // Using rectangle to check if image is rotated
-        let bitmapInfo = CGBitmapInfo.ByteOrderDefault | CGBitmapInfo(alphaInfo.rawValue)
-        let context = CGBitmapContextCreate(nil, Int(size.width), Int(size.height), bitsPerComponent, 0, colorSpace, bitmapInfo)
+        let bitmapInfo = CGBitmapInfo.ByteOrderDefault.union(CGBitmapInfo(rawValue: alphaInfo.rawValue))
+        let context = CGBitmapContextCreate(nil, Int(size.width), Int(size.height), bitsPerComponent, 0, colorSpace, bitmapInfo.rawValue)
     
         CGContextSetFillColorWithColor(context, color.CGColor)
         CGContextFillRect(context, CGRectMake(0, 0, size.width, size.height))
         let imageRef = CGBitmapContextCreateImage(context)
     
-        let image = UIImage(CGImage:imageRef, scale:UIScreen.mainScreen().scale, orientation:.Up)!
+        let image = UIImage(CGImage:imageRef!, scale:UIScreen.mainScreen().scale, orientation:.Up)
         let decompressedImage = image.hnk_decompressedImage()
     
         XCTAssertNotEqual(image, decompressedImage)
@@ -182,8 +182,8 @@ class UIImage_HanekeTests: XCTestCase {
         let exifProperties = NSDictionary(dictionary: [kCGImagePropertyOrientation: Int(orientation.rawValue)])
         let data = NSMutableData()
         let imageDestinationRef = CGImageDestinationCreateWithData(data as CFMutableDataRef, kUTTypeTIFF, 1, nil)
-        CGImageDestinationAddImage(imageDestinationRef, gradientImage.CGImage, exifProperties as CFDictionaryRef)
-        CGImageDestinationFinalize(imageDestinationRef)
+        CGImageDestinationAddImage(imageDestinationRef!, gradientImage.CGImage!, exifProperties as CFDictionaryRef)
+        CGImageDestinationFinalize(imageDestinationRef!)
         
         let image = UIImage(data:data, scale:UIScreen.mainScreen().scale)!
         

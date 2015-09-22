@@ -39,7 +39,7 @@ class CacheTests: XCTestCase {
     // MARK: cachePath
     
     func testCachePath() {
-        let expectedCachePath = DiskCache.basePath().stringByAppendingPathComponent(sut.name)
+        let expectedCachePath = NSString(string:DiskCache.basePath()).stringByAppendingPathComponent(sut.name)
         XCTAssertEqual(sut.cachePath, expectedCachePath)
     }
     
@@ -47,7 +47,7 @@ class CacheTests: XCTestCase {
     
     func testFormatPath() {
         let formatName = self.name
-        let expectedFormatPath = sut.cachePath.stringByAppendingPathComponent(formatName)
+        let expectedFormatPath = NSString(string:sut.cachePath).stringByAppendingPathComponent(formatName)
         
         let formatPath = sut.formatPath(formatName: formatName)
         
@@ -56,7 +56,7 @@ class CacheTests: XCTestCase {
     
     func testFormatPath_WithEmptyName() {
         let formatName = ""
-        let expectedFormatPath = sut.cachePath.stringByAppendingPathComponent(formatName)
+        let expectedFormatPath = NSString(string:sut.cachePath).stringByAppendingPathComponent(formatName)
         
         let formatPath = sut.formatPath(formatName: formatName)
         
@@ -235,7 +235,7 @@ class CacheTests: XCTestCase {
     func testFetch_AfterClearingMemoryCache_WithKeyAndFormatWithDiskCapacity_ExpectSuccess() {
         let key = self.name
         let data = NSData.dataWithLength(9)
-        var format = Format<NSData>(name: self.name)
+        let format = Format<NSData>(name: self.name)
         sut.addFormat(format)
         let expectation = self.expectationWithDescription(self.name)
         sut.set(value: data, key: key, formatName: format.name)

@@ -37,9 +37,9 @@ extension String {
     
     func MD5Filename() -> String {
         let MD5String = self.MD5String()
-        let pathExtension = self.pathExtension
-        if count(pathExtension) > 0 {
-            return MD5String.stringByAppendingPathExtension(pathExtension) ?? MD5String
+        let pathExtension = NSString(string:  self).pathExtension
+        if pathExtension.characters.count > 0 {
+            return NSString(string: MD5String).stringByAppendingPathExtension(pathExtension) ?? MD5String
         } else {
             return MD5String
         }

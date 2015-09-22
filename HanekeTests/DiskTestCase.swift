@@ -11,18 +11,24 @@ import XCTest
 class DiskTestCase : XCTestCase {
  
     lazy var directoryPath : String = {
-        let documentsPath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)[0] as! String
-        let directoryPath = documentsPath.stringByAppendingPathComponent(self.name)
-        return directoryPath
+        let documentsPath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)[0] 
+        let directoryPath = NSURL(string: documentsPath)!.URLByAppendingPathComponent(self.name)
+        return directoryPath.absoluteString
     }()
     
     override func setUp() {
         super.setUp()
-        NSFileManager.defaultManager().createDirectoryAtPath(directoryPath, withIntermediateDirectories: true, attributes: nil, error: nil)
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtPath(directoryPath, withIntermediateDirectories: true, attributes: nil)
+        } catch _ {
+        }
     }
     
     override func tearDown() {
-        NSFileManager.defaultManager().removeItemAtPath(directoryPath, error: nil)
+        do {
+            try NSFileManager.defaultManager().removeItemAtPath(directoryPath)
+        } catch _ {
+        }
         super.tearDown()
     }
     
@@ -40,9 +46,9 @@ class DiskTestCase : XCTestCase {
     }
     
     func uniquePath() -> String {
-        let path = self.directoryPath.stringByAppendingPathComponent("\(dataIndex)")
+        let path = NSURL(string:self.directoryPath)!.URLByAppendingPathComponent("\(dataIndex)")
         dataIndex++
-        return path
+        return path.absoluteString
     }
     
 }
